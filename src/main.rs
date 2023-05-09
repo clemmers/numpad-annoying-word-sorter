@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::time::Instant;
 
 fn main() -> std::io::Result<()> {
@@ -19,7 +20,16 @@ fn main() -> std::io::Result<()> {
     // start measuring time for rating all words
     let start_time = Instant::now();
 
-    let keyboard_layout = ["abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+    let keyboard_vec = vec!["abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+    let mut keyboard_layout: HashMap<char, &str> = HashMap::new();
+    for string in keyboard_vec
+    {
+        for c in string.chars()
+        {
+            keyboard_layout.insert(c, string);
+        }
+    }
+
 
     let mut words_rated: Vec<(String, i8)> = Vec::new();
     for word in &words
@@ -76,20 +86,16 @@ fn main() -> std::io::Result<()> {
 
 // returns an int that describes how annoying a word is to type on a numeric keypad
 // by determining how many times there are two consecutive same-key letters
-fn how_hard_is_word_to_type(word: &str, keyboard_layout: &[&str]) -> i8
+fn how_hard_is_word_to_type(word: &str, keyboard_layout: &HashMap<char, &str>) -> i8
 {
     let chars: Vec<_> = word.chars().collect();
     let mut difficulty: i8 = 0;
     for i in 0..( word.len() - 1 )
     {
-        for j in keyboard_layout.iter()
-         {
-            if j.contains(chars[i]) &&
-               j.contains(chars[i+1])
-               {
-                    difficulty += 1;
-               }
-         }
+        if keyboard_layout.get(&chars[i]).unwrap().contains(chars[i+1])
+        {
+            difficulty += 1;
+        }
     }
     difficulty
 }
